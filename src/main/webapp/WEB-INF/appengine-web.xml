@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://cloud.google.com/appengine/docs/standard/java/config/appref -->
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+    <application>arreev-api</application>
+    <runtime>java8</runtime>
+    <version>1000</version>
+    <threadsafe>true</threadsafe>
+    <ssl-enabled>true</ssl-enabled>
+</appengine-web-app>

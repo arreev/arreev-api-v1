@@ -1,0 +1,50 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+    <!-- DONT FORWARD ... REQUIRE IN CODE THAT REQUEST IS SECURE
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>all</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+    -->
+
+    <servlet>
+        <servlet-name>ping</servlet-name>
+        <servlet-class>com.arreev.api.PINGServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ping</servlet-name>
+        <url-pattern>/ping</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>account</servlet-name>
+        <servlet-class>com.arreev.api.AccountServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>account</servlet-name>
+        <url-pattern>/account</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>fleets</servlet-name>
+        <servlet-class>com.arreev.api.FleetsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>fleets</servlet-name>
+        <url-pattern>/fleets</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>fleet</servlet-name>
+        <servlet-class>com.arreev.api.FleetServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>fleet</servlet-name>
+        <url-pattern>/fleet</url-pattern>
+    </servlet-mapping>
+
+</web-app>
