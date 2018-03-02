@@ -24,7 +24,7 @@ class FleetsServlet : HttpServlet()
         }
 
         response.setHeader("access-control-allow-headers","Content-Type,Authorization,arreev-api-key" )
-        response.setHeader("access-control-allow-methods","OPTIONS,GET,POST" )
+        response.setHeader("access-control-allow-methods","OPTIONS,GET" )
         response.setHeader("access-control-allow-origin","*" )
 
         response.status = 200

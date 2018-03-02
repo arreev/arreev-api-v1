@@ -119,7 +119,7 @@ class FleetServlet : HttpServlet()
                         .build()
                 val e = transaction.add( fullentity )
                 r.fleet = asFleet( e )
-                r.debug = "add spork"
+                r.debug = "created"
             } else {
                 /*
                  * update
@@ -146,7 +146,7 @@ class FleetServlet : HttpServlet()
                         .build()
                 val e = transaction.put( fullentity )
                 r.fleet = asFleet( e )
-                r.debug = "put gulch"
+                r.debug = "updated"
             }
 
             transaction.commit()

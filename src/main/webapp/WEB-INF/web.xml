@@ -47,4 +47,22 @@
         <url-pattern>/fleet</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>transporters</servlet-name>
+        <servlet-class>com.arreev.api.TransportersServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>transporters</servlet-name>
+        <url-pattern>/transporters</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>transporter</servlet-name>
+        <servlet-class>com.arreev.api.TransporterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>transporter</servlet-name>
+        <url-pattern>/transporter</url-pattern>
+    </servlet-mapping>
+
 </web-app>

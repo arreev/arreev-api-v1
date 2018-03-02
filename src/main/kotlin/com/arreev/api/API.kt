@@ -99,3 +99,27 @@ fun asFleet( entity: Entity? ) : Fleet? {
 
     return fleet
 }
+
+@Throws( DatastoreException::class )
+fun asTransporter( entity: Entity? ) : Transporter? {
+    var transporter: Transporter? = null
+
+    if ( entity != null ) {
+        transporter = Transporter()
+        transporter.id = "${entity.key.id}"
+        transporter.name = entity.getString("name" )
+        transporter.number = entity.getLong("number" );
+        transporter.marquee = entity.getString("marquee" )
+        transporter.diatribe = entity.getString("diatribe" )
+        transporter.latitude = entity.getDouble("latitude" );
+        transporter.longitude = entity.getDouble("longitude" );
+        transporter.description = entity.getString("description" )
+        transporter.type = entity.getString("type" )
+        transporter.category = entity.getString("category" )
+        transporter.imageURL = entity.getString("imageURL" )
+        transporter.thumbnailURL = entity.getString("thumbnailURL" )
+        transporter.status = entity.getString("status" )
+    }
+
+    return transporter
+}
