@@ -9,7 +9,8 @@ import com.google.cloud.datastore.*
 /**
  *
  */
-class TransporterServlet : HttpServlet() {
+class TransporterServlet : HttpServlet()
+{
     private val datastore = DatastoreOptions.getDefaultInstance().service
     private val gson = GsonBuilder().create()
 
@@ -58,6 +59,7 @@ class TransporterServlet : HttpServlet() {
                 transporter.diatribe = entity.getString("diatribe")
                 transporter.latitude = entity.getDouble("latitude")
                 transporter.longitude = entity.getDouble("longitude")
+                transporter.inservice = entity.getBooleanOr("inservice",false )
                 transporter.type = entity.getString("type")
                 transporter.category = entity.getString("category")
                 transporter.description = entity.getString("description")
@@ -74,6 +76,7 @@ class TransporterServlet : HttpServlet() {
         } finally {
         }
 
+        // TODO: dont do this here ... use ok like in FollowServlet
         val json = gson.toJson(r, TransporterServlet.TransporterResponse::class.java)
         response.writer.write(json)
     }
@@ -116,6 +119,7 @@ class TransporterServlet : HttpServlet() {
                         .set( "diatribe",transporter.diatribe ?: "" )
                         .set( "latitude",transporter.latitude ?: 0.0 )
                         .set( "longitude",transporter.longitude ?: 0.0 )
+                        .set( "inservice",transporter.inservice ?: false )
                         .set( "type",transporter.type ?: "" )
                         .set( "category",transporter.category ?: "" )
                         .set( "description",transporter.description ?: "" )
@@ -142,6 +146,7 @@ class TransporterServlet : HttpServlet() {
                 val _diatribe = transporter.diatribe ?: entity.getString("diatribe" )
                 val _latitude = transporter.latitude ?: entity.getDouble("latitude" )
                 val _longitude = transporter.longitude ?: entity.getDouble("longitude" )
+                val _inservice = transporter.inservice ?: entity.getBooleanOr("inservice",false )
                 val _description = transporter.description ?: entity.getString("description" )
                 val _type = transporter.type ?: entity.getString("type" )
                 val _category = transporter.category ?: entity.getString("category" )
@@ -155,6 +160,7 @@ class TransporterServlet : HttpServlet() {
                         .set( "diatribe",_diatribe )
                         .set( "latitude",_latitude )
                         .set( "longitude",_longitude )
+                        .set( "inservice",_inservice ?: false )
                         .set( "description",_description )
                         .set( "type",_type )
                         .set( "category",_category )
@@ -169,6 +175,7 @@ class TransporterServlet : HttpServlet() {
 
             transaction?.commit()
 
+            // TODO: dont do this here ... use ok like in FollowServlet
             val json = gson.toJson( r,TransporterResponse::class.java )
             response.writer.write( json )
         } catch ( x:GarbageInException ) {

@@ -10,6 +10,7 @@ class Transporter
     var diatribe: String? = null
     var latitude: Double? = null
     var longitude: Double? = null
+    var inservice: Boolean? = null
     var description: String? = null
     var type: String? = null
     var category: String? = null

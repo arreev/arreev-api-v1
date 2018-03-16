@@ -65,4 +65,22 @@
         <url-pattern>/transporter</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>follow</servlet-name>
+        <servlet-class>com.arreev.api.FollowServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>follow</servlet-name>
+        <url-pattern>/follow</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>follows</servlet-name>
+        <servlet-class>com.arreev.api.FollowsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>follows</servlet-name>
+        <url-pattern>/follows</url-pattern>
+    </servlet-mapping>
+
 </web-app>

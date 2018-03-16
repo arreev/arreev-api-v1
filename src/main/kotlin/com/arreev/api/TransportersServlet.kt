@@ -67,6 +67,7 @@ class TransportersServlet : HttpServlet()
                     transporter.diatribe = entity.getString("diatribe" )
                     transporter.latitude = entity.getDouble("latitude" )
                     transporter.longitude = entity.getDouble("longitude" )
+                    transporter.inservice = entity.getBooleanOr("inservice",false )
                     transporter.description = entity.getString("description" )
                     transporter.type = entity.getString("type" )
                     transporter.category = entity.getString("category" )
@@ -78,7 +79,7 @@ class TransportersServlet : HttpServlet()
             }
 
             r.transporters = transporters.toTypedArray()
-        } catch ( x:Exception ) {
+        } catch ( x:DatastoreException ) {
             r.debug = x.message
         }
 

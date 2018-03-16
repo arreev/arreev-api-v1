@@ -113,6 +113,7 @@ fun asTransporter( entity: Entity? ) : Transporter? {
         transporter.diatribe = entity.getString("diatribe" )
         transporter.latitude = entity.getDouble("latitude" );
         transporter.longitude = entity.getDouble("longitude" );
+        transporter.inservice = entity.getBoolean("inservice" )
         transporter.description = entity.getString("description" )
         transporter.type = entity.getString("type" )
         transporter.category = entity.getString("category" )
@@ -122,4 +123,26 @@ fun asTransporter( entity: Entity? ) : Transporter? {
     }
 
     return transporter
+}
+
+@Throws( DatastoreException::class )
+fun asFollow( entity: Entity? ) : Follow? {
+    var follow: Follow? = null
+
+    if ( entity != null ) {
+        follow = Follow()
+        follow.id = "${entity.key.id}"
+        follow.name = entity.getString("name" )
+
+        follow.notifyWhenArrive = entity.getBooleanOr("notifyWhenArrive",false )
+        follow.notifyWhenDepart = entity.getBooleanOr("notifyWhenDepart",false )
+        follow.notifyWhenDelayed = entity.getBooleanOr("notifyWhenDelayed",false )
+
+        follow.subscribeToMessages = entity.getBooleanOr("subscribeToMessages",false )
+        follow.subscribeToWarnings = entity.getBooleanOr("subscribeToWarnings",false )
+
+        follow.status = entity.getString("status" )
+    }
+
+    return follow
 }
