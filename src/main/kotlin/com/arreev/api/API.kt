@@ -101,6 +101,25 @@ fun asFleet( entity: Entity? ) : Fleet? {
 }
 
 @Throws( DatastoreException::class )
+fun asRoute( entity: Entity? ) : Route? {
+    var route: Route? = null
+
+    if ( entity != null ) {
+        route = Route()
+        route.id = "${entity.key.id}"
+        route.name = entity.getString("name" )
+        route.description = entity.getString("description" )
+        route.type = entity.getString("type" )
+        route.category = entity.getString("category" )
+        route.imageURL = entity.getString("imageURL" )
+        route.thumbnailURL = entity.getString("thumbnailURL" )
+        route.status = entity.getString("status" )
+    }
+
+    return route
+}
+
+@Throws( DatastoreException::class )
 fun asTransporter( entity: Entity? ) : Transporter? {
     var transporter: Transporter? = null
 

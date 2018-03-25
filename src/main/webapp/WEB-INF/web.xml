@@ -66,6 +66,24 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>routes</servlet-name>
+        <servlet-class>com.arreev.api.RoutesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>routes</servlet-name>
+        <url-pattern>/routes</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>route</servlet-name>
+        <servlet-class>com.arreev.api.RouteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>route</servlet-name>
+        <url-pattern>/route</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>follow</servlet-name>
         <servlet-class>com.arreev.api.FollowServlet</servlet-class>
     </servlet>

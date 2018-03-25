@@ -27,7 +27,7 @@ class TransporterServlet : HttpServlet()
 
         response.status = 200
         response.setHeader("access-control-allow-headers", "Content-Type,Authorization,arreev-api-key")
-        response.setHeader("access-control-allow-methods", "OPTIONS,GET,POST")
+        response.setHeader("access-control-allow-methods", "OPTIONS,GET,POST,DELETE")
         response.setHeader("access-control-allow-origin", "*")
     }
 
@@ -40,7 +40,7 @@ class TransporterServlet : HttpServlet()
         response.status = 200
         response.contentType = "application/json"
         response.setHeader("access-control-allow-headers", "Content-Type,Authorization,arreev-api-key")
-        response.setHeader("access-control-allow-methods", "OPTIONS,GET,POST")
+        response.setHeader("access-control-allow-methods", "GET")
         response.setHeader("access-control-allow-origin", "*")
 
         val r = TransporterResponse()
@@ -90,7 +90,7 @@ class TransporterServlet : HttpServlet()
         response.status = 200
         response.contentType = "application/json"
         response.setHeader("access-control-allow-headers", "Content-Type,Authorization,arreev-api-key")
-        response.setHeader("access-control-allow-methods", "OPTIONS,GET,POST")
+        response.setHeader("access-control-allow-methods", "POST")
         response.setHeader("access-control-allow-origin", "*")
 
         val r = TransporterResponse()
@@ -176,6 +176,52 @@ class TransporterServlet : HttpServlet()
             transaction?.commit()
 
             // TODO: dont do this here ... use ok like in FollowServlet
+            val json = gson.toJson( r,TransporterResponse::class.java )
+            response.writer.write( json )
+        } catch ( x:GarbageInException ) {
+            response.sendError(400,x.message )
+        } catch ( x:DatastoreException ) {
+            response.sendError(500,x.message )
+        } finally {
+            if ( transaction?.isActive ?: false ) {
+                transaction?.rollback()
+            }
+        }
+    }
+
+    override fun doDelete( request:HttpServletRequest,response:HttpServletResponse ) {
+        if ( !verifySSL( request ) ) {
+            response.sendError( HttpServletResponse.SC_FORBIDDEN );
+            return;
+        }
+
+        response.status = 200
+        response.contentType = "application/json"
+        response.setHeader("access-control-allow-headers", "Content-Type,Authorization,arreev-api-key")
+        response.setHeader("access-control-allow-methods", "DELETE")
+        response.setHeader("access-control-allow-origin", "*")
+
+        val r = TransporterResponse()
+
+        var transaction: Transaction? = null
+        try {
+            val ownerid = request.getParameter( "ownerid" )
+            val id = request.getParameter( "id" )
+
+            transaction = datastore.newTransaction() // could throw DataStoreException
+            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "transporter" );
+
+            val immutableid = id ?: ""
+            val key = keyFactory.newKey( immutableid.toLong() )
+
+            /*
+             * TODO: get and check ownerid matches
+             */
+
+            datastore.delete( key )
+
+            transaction.commit()
+
             val json = gson.toJson( r,TransporterResponse::class.java )
             response.writer.write( json )
         } catch ( x:GarbageInException ) {
