@@ -1,7 +1,7 @@
 
 package com.arreev.api
 
-class Route
+class Waypoint
 {
     var id: String? = null
     var name: String? = null
@@ -12,8 +12,11 @@ class Route
     var thumbnailURL: String? = null
     var status: String? = null
 
-    var begAddress: String? = null
-    var endAddress: String? = null
+    var address: String? = null
+    var latitude: Double? = null
+    var longitude: Double? = null
+    var index: Long? = null
 
     var ownerid: String? = null
+    var routeid: String? = null
 }

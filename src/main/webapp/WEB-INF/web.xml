@@ -84,6 +84,24 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>waypoints</servlet-name>
+        <servlet-class>com.arreev.api.WaypointsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>waypoints</servlet-name>
+        <url-pattern>/waypoints</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>waypoint</servlet-name>
+        <servlet-class>com.arreev.api.WaypointServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>waypoint</servlet-name>
+        <url-pattern>/waypoint</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>follow</servlet-name>
         <servlet-class>com.arreev.api.FollowServlet</servlet-class>
     </servlet>

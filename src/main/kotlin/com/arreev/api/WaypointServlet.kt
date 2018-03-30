@@ -11,14 +11,14 @@ import com.google.cloud.datastore.*
  * https://console.cloud.google.com/logs/viewer
  * https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server
  */
-class RouteServlet : HttpServlet()
+class WaypointServlet : HttpServlet()
 {
     private val datastore = DatastoreOptions.getDefaultInstance().service
     private val gson = GsonBuilder().create()
 
-    class RouteResponse : APIResponse()
+    class WaypointResponse : APIResponse()
     {
-        var route: Route? = null
+        var waypoint: Waypoint? = null
         var debug: String? = null
     }
 
@@ -46,27 +46,29 @@ class RouteServlet : HttpServlet()
         response.setHeader("access-control-allow-methods","GET" )
         response.setHeader("access-control-allow-origin","*" )
 
-        val r = RouteResponse()
+        val r = WaypointResponse()
 
         try {
             val id = request.getParameter("id" )
 
-            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "route" )
+            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "waypoint" )
             val entity = datastore.get( keyFactory.newKey( id.toLong() ) )
             if ( entity != null ) {
-                val route = Route()
-                route.id = "${entity.key.id}";
-                route.name = entity.getString("name" )
-                route.type = entity.getString("type" )
-                route.category = entity.getString("category" )
-                route.description = entity.getString("description" )
-                route.imageURL = entity.getString("imageURL" )
-                route.thumbnailURL = entity.getString("thumbnailURL" )
-                route.begAddress = entity.getString("begAddress" )
-                route.endAddress = entity.getString("endAddress" )
-                route.status = entity.getString("status" )
-                r.route = route;
-                r.debug = "found ${r?.route?.name}"
+                val waypoint = Waypoint()
+                waypoint.id = "${entity.key.id}";
+                waypoint.name = entity.getString("name" )
+                waypoint.type = entity.getString("type" )
+                waypoint.category = entity.getString("category" )
+                waypoint.description = entity.getString("description" )
+                waypoint.imageURL = entity.getString("imageURL" )
+                waypoint.thumbnailURL = entity.getString("thumbnailURL" )
+                waypoint.address = entity.getString("address" )
+                waypoint.latitude = entity.getDouble("latitude" )
+                waypoint.longitude = entity.getDouble("longitude" )
+                waypoint.index = entity.getLong("index" );
+                waypoint.status = entity.getString("status" )
+                r.waypoint = waypoint;
+                r.debug = "found ${r?.waypoint?.name}"
             } else {
                 r.debug = "not found: ${id}"
             }
@@ -75,7 +77,7 @@ class RouteServlet : HttpServlet()
         } finally {
         }
 
-        val json = gson.toJson( r,RouteResponse::class.java )
+        val json = gson.toJson( r,WaypointResponse::class.java )
         response.writer.write( json )
     }
 
@@ -91,56 +93,62 @@ class RouteServlet : HttpServlet()
         response.setHeader("access-control-allow-methods","POST" )
         response.setHeader("access-control-allow-origin","*" )
 
-        val r = RouteResponse()
+        val r = WaypointResponse()
 
         var transaction: Transaction? = null
         try {
             val ownerid = request.getParameter("ownerid" )
+            val routeid = request.getParameter("routeid" )
 
             val body = body( request )
-            val route = gson.fromJson<Route>(body ?: "{}",Route::class.java )
-            if ( route?.equals( "{}" ) ?: false ) { throw GarbageInException( "invalid route data" ); }
+            val waypoint = gson.fromJson<Waypoint>(body ?: "{}",Waypoint::class.java )
+            if ( waypoint?.equals( "{}" ) ?: false ) { throw GarbageInException( "invalid waypoint data" ); }
 
             transaction = datastore.newTransaction() // could throw DataStoreException
-            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "route" );
+            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "waypoint" );
 
-            if ( route.id == null ) {
+            if ( waypoint.id == null ) {
                 /*
                  * create
                  */
                 val virignkey = keyFactory.newKey()
                 val fullentity = Entity.newBuilder( virignkey )
-                        .set( "name",route.name )
-                        .set( "description",route.description )
-                        .set( "type",route.type )
-                        .set( "category",route.category )
-                        .set( "imageURL",route.imageURL ?: "" )
-                        .set( "thumbnailURL",route.thumbnailURL ?: "" )
-                        .set( "begAddress",route.begAddress ?: "" )
-                        .set( "endAddress",route.endAddress ?: "" )
+                        .set( "name",waypoint.name )
+                        .set( "description",waypoint.description )
+                        .set( "type",waypoint.type )
+                        .set( "category",waypoint.category )
+                        .set( "imageURL",waypoint.imageURL ?: "" )
+                        .set( "thumbnailURL",waypoint.thumbnailURL ?: "" )
+                        .set( "address",waypoint.address ?: "" )
+                        .set( "latitude",waypoint.latitude ?: 0.0 )
+                        .set( "longitude",waypoint.longitude ?: 0.0 )
+                        .set( "index",waypoint.index ?: 0 )
                         .set( "status","active" )
                         .set( "ownerid",ownerid )
+                        .set( "routeid",routeid )
                         .build()
                 val e = transaction.add( fullentity )
-                r.route = asRoute( e )
+                r.waypoint = asWaypoint( e )
                 r.debug = "created"
             } else {
                 /*
                  * update
                  */
-                val immutableid = route.id ?: ""
+                val immutableid = waypoint.id ?: ""
                 val key = keyFactory.newKey( immutableid.toLong() )
                 val entity = transaction.get( key )
                 if ( !verifyOwnership( entity,ownerid ) ) { throw Exception( "ownerid mis-match" ) }
-                val _name = route.name ?: entity.getString("name" )
-                val _description = route.description ?: entity.getString("description" )
-                val _type = route.type ?: entity.getString("type" )
-                val _category = route.category ?: entity.getString("category" )
-                val _imageURL = route.imageURL ?: entity.getString("imageURL" )
-                val _thumbnailURL = route.thumbnailURL ?: entity.getString("thumbnailURL" )
-                val _begAddress = route.begAddress ?: entity.getString("begAddress" )
-                val _endAddress = route.endAddress ?: entity.getString("endAddress" )
-                val _status = route.status ?: entity.getString("status" )
+                val _name = waypoint.name ?: entity.getString("name" )
+                val _description = waypoint.description ?: entity.getString("description" )
+                val _type = waypoint.type ?: entity.getString("type" )
+                val _category = waypoint.category ?: entity.getString("category" )
+                val _imageURL = waypoint.imageURL ?: entity.getString("imageURL" )
+                val _thumbnailURL = waypoint.thumbnailURL ?: entity.getString("thumbnailURL" )
+                val _address = waypoint.address ?: entity.getString("address" )
+                val _latitude = waypoint.latitude ?: entity.getDouble("latitude" )
+                val _longitude = waypoint.longitude ?: entity.getDouble("longitude" )
+                val _index = waypoint.index ?: entity.getLong("index" )
+                val _status = waypoint.status ?: entity.getString("status" )
                 val fullentity = Entity.newBuilder( entity )
                         .set( "name",_name  )
                         .set( "description",_description )
@@ -148,18 +156,20 @@ class RouteServlet : HttpServlet()
                         .set( "category",_category )
                         .set( "imageURL",_imageURL )
                         .set( "thumbnailURL",_thumbnailURL )
-                        .set( "begAddress",_begAddress )
-                        .set( "endAddress",_endAddress )
+                        .set( "address",_address )
+                        .set( "latitude",_latitude )
+                        .set( "longitude",_longitude )
+                        .set( "index",_index )
                         .set( "status",_status )
                         .build()
                 val e = transaction.put( fullentity )
-                r.route = asRoute( e )
+                r.waypoint = asWaypoint( e )
                 r.debug = "updated"
             }
 
             transaction.commit()
 
-            val json = gson.toJson( r,RouteResponse::class.java )
+            val json = gson.toJson( r,WaypointResponse::class.java )
             response.writer.write( json )
         } catch ( x:GarbageInException ) {
             response.sendError(400,x.message )
@@ -184,7 +194,7 @@ class RouteServlet : HttpServlet()
         response.setHeader("access-control-allow-methods", "DELETE")
         response.setHeader("access-control-allow-origin", "*")
 
-        val r = RouteResponse()
+        val r = WaypointResponse()
 
         var transaction: Transaction? = null
         try {
@@ -192,7 +202,7 @@ class RouteServlet : HttpServlet()
             val id = request.getParameter("id" )
 
             transaction = datastore.newTransaction() // could throw DataStoreException
-            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "route" );
+            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "waypoint" );
 
             val immutableid = id ?: ""
             val key = keyFactory.newKey( immutableid.toLong() )
@@ -205,7 +215,7 @@ class RouteServlet : HttpServlet()
 
             transaction.commit()
 
-            val json = gson.toJson( r,RouteResponse::class.java )
+            val json = gson.toJson( r,WaypointResponse::class.java )
             response.writer.write( json )
         } catch ( x:GarbageInException ) {
             response.sendError(400,x.message )
