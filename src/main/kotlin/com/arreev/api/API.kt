@@ -28,11 +28,8 @@ fun verifySSL(request:HttpServletRequest ) : Boolean {
 }
 
 fun verifyOwnership(entity: Entity?, ownerid: String? ) : Boolean {
-    var verified = false
-
     val entityownerid = entity?.getString("ownerid" )
-    verified = entity?.getString("ownerid" )?.equals( ownerid,false ) ?: false
-
+    val verified = entity?.getString("ownerid" )?.equals( ownerid,false ) ?: false
     return verified
 }
 
@@ -189,4 +186,41 @@ fun asFollow( entity: Entity? ) : Follow? {
     }
 
     return follow
+}
+
+@Throws( DatastoreException::class )
+fun asAssignment( entity: Entity? ) : Assignment? {
+    var assignment: Assignment? = null
+
+    if ( entity != null ) {
+        assignment = Assignment()
+        assignment.id = "${entity.key.id}"
+        assignment.type = entity.getString("type" )
+        assignment.routeid = entity.getString("routeid" )
+        assignment.transporterid = entity.getString("transporterid" )
+        assignment.imageURL = entity.getString("imageURL" )
+        assignment.thumbnailURL = entity.getString("thumbnailURL" )
+        assignment.status = entity.getString("status" )
+    }
+
+    return assignment
+}
+
+@Throws( DatastoreException::class )
+fun asGroup( entity: Entity? ) : Group? {
+    var group: Group? = null
+
+    if ( entity != null ) {
+        group = Group()
+        group.id = "${entity.key.id}"
+        group.name = entity.getString("name" )
+        group.type = entity.getString("type" )
+        group.category = entity.getString("category" )
+        group.description = entity.getString("description" )
+        group.imageURL = entity.getString("imageURL" )
+        group.thumbnailURL = entity.getString("thumbnailURL" )
+        group.status = entity.getString("status" )
+    }
+
+    return group
 }

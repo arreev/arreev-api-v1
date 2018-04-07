@@ -102,6 +102,24 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>assignments</servlet-name>
+        <servlet-class>com.arreev.api.AssignmentsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>assignments</servlet-name>
+        <url-pattern>/assignments</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>assignment</servlet-name>
+        <servlet-class>com.arreev.api.AssignmentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>assignment</servlet-name>
+        <url-pattern>/assignment</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>follow</servlet-name>
         <servlet-class>com.arreev.api.FollowServlet</servlet-class>
     </servlet>
@@ -117,6 +135,23 @@
     <servlet-mapping>
         <servlet-name>follows</servlet-name>
         <url-pattern>/follows</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>groups</servlet-name>
+        <servlet-class>com.arreev.api.GroupsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>groups</servlet-name>
+        <url-pattern>/groups</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>group</servlet-name>
+        <servlet-class>com.arreev.api.GroupServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>group</servlet-name>
+        <url-pattern>/group</url-pattern>
     </servlet-mapping>
 
 </web-app>
