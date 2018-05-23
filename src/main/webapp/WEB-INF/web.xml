@@ -154,4 +154,21 @@
         <url-pattern>/group</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>persons</servlet-name>
+        <servlet-class>com.arreev.api.PersonsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>persons</servlet-name>
+        <url-pattern>/persons</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>person</servlet-name>
+        <servlet-class>com.arreev.api.PersonServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>person</servlet-name>
+        <url-pattern>/person</url-pattern>
+    </servlet-mapping>
+
 </web-app>

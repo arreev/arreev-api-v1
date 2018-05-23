@@ -11,14 +11,14 @@ import com.google.cloud.datastore.*
  * https://console.cloud.google.com/logs/viewer
  * https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server
  */
-class FollowServlet : HttpServlet()
+class PersonServlet : HttpServlet()
 {
     private val datastore = DatastoreOptions.getDefaultInstance().service
     private val gson = GsonBuilder().create()
 
-    class FollowResponse : APIResponse()
+    class PersonResponse : APIResponse()
     {
-        var follow: Follow? = null
+        var person: Person? = null
         var id: String?  = null
         var debug: String? = null
     }
@@ -47,26 +47,25 @@ class FollowServlet : HttpServlet()
         response.setHeader("access-control-allow-methods","GET" )
         response.setHeader("access-control-allow-origin","*" )
 
-        val r = FollowResponse()
+        val r = PersonResponse()
 
         try {
             val id = request.getParameter("id" )
 
-            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "follow" )
+            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "person" )
             val entity = datastore.get( keyFactory.newKey( id.toLong() ) )
             if ( entity != null ) {
-                val follow = Follow()
-                follow.id = "${entity.key.id}";
-                follow.name = entity.getString("name" )
-                follow.notifyWhenArrive = entity.getBoolean("notifyWhenArrive" )
-                follow.notifyWhenDepart = entity.getBoolean("notifyWhenDepart" )
-                follow.notifyWhenDelayed = entity.getBoolean("notifyWhenDelayed" )
-                follow.subscribeToMessages = entity.getBoolean("subscribeToMessages" )
-                follow.subscribeToWarnings = entity.getBoolean("subscribeToWarnings" )
-                follow.transporterid = entity.getString("transporterid" )
-                follow.status = entity.getString("status" )
-                r.follow = follow;
-                r.debug = "found ${r?.follow?.name}"
+                val person = Person()
+                person.id = "${entity.key.id}";
+                person.name = entity.getString("name" )
+                person.type = entity.getString("type" )
+                person.category = entity.getString("category" )
+                person.description = entity.getString("description" )
+                person.imageURL = entity.getString("imageURL" )
+                person.thumbnailURL = entity.getString("thumbnailURL" )
+                person.status = entity.getString("status" )
+                r.person = person;
+                r.debug = "found ${r?.person?.name}"
             } else {
                 r.debug = "not found: ${id}"
             }
@@ -75,16 +74,10 @@ class FollowServlet : HttpServlet()
         } finally {
         }
 
-        val json = gson.toJson( r,FollowResponse::class.java )
+        val json = gson.toJson( r,PersonResponse::class.java )
         response.writer.write( json )
     }
 
-    /*
-     * TODO: on all these upserts, should be enforcing unique ownerid,fleetid,?
-     * https://cloud.google.com/datastore/docs/reference/data/rest/v1/Key
-     * https://cloud.google.com/datastore/docs/concepts/entities#datastore-upsert-java
-     *
-     */
     override fun doPost( request:HttpServletRequest,response:HttpServletResponse ) {
         if ( !verifySSL( request ) ) {
             response.sendError( HttpServletResponse.SC_FORBIDDEN );
@@ -97,74 +90,71 @@ class FollowServlet : HttpServlet()
         response.setHeader("access-control-allow-methods","POST" )
         response.setHeader("access-control-allow-origin","*" )
 
-        val r = FollowResponse()
+        val r = PersonResponse()
 
         var transaction: Transaction? = null
         try {
             val ownerid = request.getParameter("ownerid" )
-            val fleetid = request.getParameter("fleetid" )
+            val groupid = request.getParameter("groupid" )
 
             val body = body( request )
-            val follow = gson.fromJson<Follow>(body ?: "{}",Follow::class.java )
-            if ( follow?.equals( "{}" ) ?: false ) { throw GarbageInException( "invalid follow data" ); }
+            val person = gson.fromJson<Person>(body ?: "{}",Person::class.java )
+            if ( person?.equals( "{}" ) ?: false ) { throw GarbageInException( "invalid person data" ); }
 
             transaction = datastore.newTransaction() // could throw DataStoreException
-            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "follow" );
+            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "person" );
 
-            if ( follow.id == null ) {
+            if ( person.id == null ) {
                 /*
                  * create
                  */
                 val virignkey = keyFactory.newKey()
                 val fullentity = Entity.newBuilder( virignkey )
-                        .set( "ownerid",ownerid )
-                        .set( "fleetid",fleetid )
-                        .set( "name",follow.name ?: "" )
-                        .set( "notifyWhenArrive",follow.notifyWhenArrive ?: false )
-                        .set( "notifyWhenDepart",follow.notifyWhenDepart ?: false )
-                        .set( "notifyWhenDelayed",follow.notifyWhenDelayed ?: false )
-                        .set( "subscribeToMessages",follow.subscribeToMessages ?: false )
-                        .set( "subscribeToWarnings",follow.subscribeToWarnings ?: false )
-                        .set( "transporterid",follow.transporterid )
+                        .set( "name",person.name )
+                        .set( "description",person.description )
+                        .set( "type",person.type )
+                        .set( "category",person.category )
+                        .set( "imageURL",person.imageURL ?: "" )
+                        .set( "thumbnailURL",person.thumbnailURL ?: "" )
                         .set( "status","active" )
+                        .set( "ownerid",ownerid )
+                        .set( "groupid",groupid )
                         .build()
                 val e = transaction.add( fullentity )
-                r.follow = asFollow( e )
+                r.person = asPerson( e )
                 r.debug = "created"
             } else {
                 /*
                  * update
                  */
-                val immutableid = follow.id ?: ""
+                val immutableid = person.id ?: ""
                 val key = keyFactory.newKey( immutableid.toLong() )
                 val entity = transaction.get( key )
                 if ( !verifyOwnership( entity,ownerid ) ) { throw Exception( "ownerid mis-match" ) }
-                val _name = follow.name ?: entity.getString("name" )
-                val _notifyWhenArrive = follow.notifyWhenArrive ?: entity.getBoolean("notifyWhenArrive" )
-                val _notifyWhenDepart = follow.notifyWhenDepart ?: entity.getBoolean("notifyWhenDepart" )
-                val _notifyWhenDelayed = follow.notifyWhenDelayed ?: entity.getBoolean("notifyWhenDelayed" )
-                val _subscribeToMessages = follow.subscribeToMessages ?: entity.getBoolean("subscribeToMessages" )
-                val _subscribeToWarnings = follow.subscribeToWarnings ?: entity.getBoolean("subscribeToWarnings" )
-                val _transporterid = follow.transporterid ?: entity.getString("transporterid" )
-                val _status = follow.status ?: entity.getString("status" )
+                val _name = person.name ?: entity.getString("name" )
+                val _description = person.description ?: entity.getString("description" )
+                val _type = person.type ?: entity.getString("type" )
+                val _category = person.category ?: entity.getString("category" )
+                val _imageURL = person.imageURL ?: entity.getString("imageURL" )
+                val _thumbnailURL = person.thumbnailURL ?: entity.getString("thumbnailURL" )
+                val _status = person.status ?: entity.getString("status" )
                 val fullentity = Entity.newBuilder( entity )
                         .set( "name",_name  )
-                        .set( "notifyWhenArrive",_notifyWhenArrive )
-                        .set( "notifyWhenDepart",_notifyWhenDepart )
-                        .set( "notifyWhenDelayed",_notifyWhenDelayed )
-                        .set( "subscribeToMessages",_subscribeToMessages )
-                        .set( "subscribeToWarnings",_subscribeToWarnings )
-                        .set( "transporterid",_transporterid )
+                        .set( "description",_description )
+                        .set( "type",_type )
+                        .set( "category",_category )
+                        .set( "imageURL",_imageURL )
+                        .set( "thumbnailURL",_thumbnailURL )
                         .set( "status",_status )
                         .build()
                 val e = transaction.put( fullentity )
-                r.follow = asFollow( e )
+                r.person = asPerson( e )
                 r.debug = "updated"
             }
 
             transaction.commit()
 
-            val json = gson.toJson( r,FollowResponse::class.java )
+            val json = gson.toJson( r,PersonResponse::class.java )
             response.writer.write( json )
         } catch ( x:GarbageInException ) {
             response.sendError(400,x.message )
@@ -189,7 +179,7 @@ class FollowServlet : HttpServlet()
         response.setHeader("access-control-allow-methods", "DELETE")
         response.setHeader("access-control-allow-origin", "*")
 
-        val r = FollowResponse()
+        val r = PersonResponse()
 
         var transaction: Transaction? = null
         try {
@@ -197,7 +187,7 @@ class FollowServlet : HttpServlet()
             val id = request.getParameter("id" )
 
             transaction = datastore.newTransaction() // could throw DataStoreException
-            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "follow" );
+            val keyFactory = datastore.newKeyFactory().setNamespace( "com.arreev.api" ).setKind( "person" );
 
             val immutableid = id ?: ""
             val key = keyFactory.newKey( immutableid.toLong() )
@@ -212,7 +202,7 @@ class FollowServlet : HttpServlet()
 
             transaction.commit()
 
-            val json = gson.toJson( r,FollowResponse::class.java )
+            val json = gson.toJson( r,PersonResponse::class.java )
             response.writer.write( json )
         } catch ( x:GarbageInException ) {
             response.sendError(400,x.message )

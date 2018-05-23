@@ -50,9 +50,14 @@ class TransportersServlet : HttpServlet()
 
             val ownerid = request.getParameter("ownerid" )
             val fleetid = request.getParameter("fleetid" )
+
+            val filters = StructuredQuery.CompositeFilter.and(
+                    StructuredQuery.PropertyFilter.eq("ownerid",ownerid ),
+                    StructuredQuery.PropertyFilter.eq("fleetid",fleetid )
+            )
+
             val query = Query.newEntityQueryBuilder().setNamespace( "com.arreev.api" ).setKind( "transporter" )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("ownerid",ownerid ) )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("fleetid",fleetid ) )
+                    .setFilter( filters )
                     .build()
 
             val entitys = datastore.run( query )

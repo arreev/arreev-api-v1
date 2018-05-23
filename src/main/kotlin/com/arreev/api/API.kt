@@ -178,9 +178,9 @@ fun asFollow( entity: Entity? ) : Follow? {
         follow.notifyWhenArrive = entity.getBooleanOr("notifyWhenArrive",false )
         follow.notifyWhenDepart = entity.getBooleanOr("notifyWhenDepart",false )
         follow.notifyWhenDelayed = entity.getBooleanOr("notifyWhenDelayed",false )
-
         follow.subscribeToMessages = entity.getBooleanOr("subscribeToMessages",false )
         follow.subscribeToWarnings = entity.getBooleanOr("subscribeToWarnings",false )
+        follow.transporterid = entity.getString("transporterid" )
 
         follow.status = entity.getString("status" )
     }
@@ -223,4 +223,23 @@ fun asGroup( entity: Entity? ) : Group? {
     }
 
     return group
+}
+
+@Throws( DatastoreException::class )
+fun asPerson( entity: Entity? ) : Person? {
+    var person: Person? = null
+
+    if ( entity != null ) {
+        person = Person()
+        person.id = "${entity.key.id}"
+        person.name = entity.getString("name" )
+        person.type = entity.getString("type" )
+        person.category = entity.getString("category" )
+        person.description = entity.getString("description" )
+        person.imageURL = entity.getString("imageURL" )
+        person.thumbnailURL = entity.getString("thumbnailURL" )
+        person.status = entity.getString("status" )
+    }
+
+    return person
 }

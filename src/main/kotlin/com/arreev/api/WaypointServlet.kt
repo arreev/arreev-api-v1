@@ -19,6 +19,7 @@ class WaypointServlet : HttpServlet()
     class WaypointResponse : APIResponse()
     {
         var waypoint: Waypoint? = null
+        var id: String?  = null
         var debug: String? = null
     }
 
@@ -209,9 +210,11 @@ class WaypointServlet : HttpServlet()
 
             /*
              * TODO: get and check ownerid matches
+             * TODO: error if id not found
              */
 
             datastore.delete( key )
+            r.id = id
 
             transaction.commit()
 

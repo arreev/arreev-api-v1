@@ -43,9 +43,14 @@ class WaypointsServlet : HttpServlet()
 
             val ownerid = request.getParameter("ownerid" )
             val routeid = request.getParameter("routeid" )
+
+            val filters = StructuredQuery.CompositeFilter.and(
+                    StructuredQuery.PropertyFilter.eq("ownerid",ownerid ),
+                    StructuredQuery.PropertyFilter.eq("routeid",routeid )
+            )
+
             val query = Query.newEntityQueryBuilder().setNamespace( "com.arreev.api" ).setKind( "waypoint" )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("ownerid",ownerid ) )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("routeid",routeid ) )
+                    .setFilter( filters )
                     .build()
 
             val entitys = datastore.run( query )

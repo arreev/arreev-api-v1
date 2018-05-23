@@ -6,11 +6,13 @@ import javax.servlet.http.*
 import com.google.gson.*
 import com.google.cloud.datastore.*
 
-class FollowsServlet : HttpServlet() {
+class FollowsServlet : HttpServlet()
+{
     private val datastore = DatastoreOptions.getDefaultInstance().service
     private val gson = GsonBuilder().create()
 
-    class FollowsResponse : APIResponse() {
+    class FollowsResponse : APIResponse()
+    {
         var follows: Array<Follow>? = null
         var debug: String? = null
     }
@@ -48,12 +50,15 @@ class FollowsServlet : HttpServlet() {
         try {
             val ownerid = request.getParameter("ownerid" )
             val fleetid = request.getParameter("fleetid" )
-            val transporterid = request.getParameter("transporterid" )
+
+            val filters = StructuredQuery.CompositeFilter.and(
+                    StructuredQuery.PropertyFilter.eq("ownerid",ownerid ),
+                    StructuredQuery.PropertyFilter.eq("fleetid",fleetid )
+            )
 
             val query = Query.newEntityQueryBuilder().setNamespace( "com.arreev.api" ).setKind( "follow" )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("ownerid",ownerid ) )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("fleetid",fleetid ) )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("transporterid",transporterid ) )
+                    .setFilter( filters )
+                    .setLimit( 500 ) // TODO: paging support
                     .build()
 
             val follows = mutableListOf<Follow>()
@@ -64,11 +69,12 @@ class FollowsServlet : HttpServlet() {
                 val follow = Follow()
                 follow.id = "${entity.key.id}"
                 follow.name = entity.getString("name" )
-                follow.notifyWhenArrive = entity.getBooleanOr("notifyWhenArrive",false )
-                follow.notifyWhenDepart = entity.getBooleanOr("notifyWhenDepart",false )
-                follow.notifyWhenDelayed = entity.getBooleanOr("notifyWhenDelayed",false )
-                follow.subscribeToMessages = entity.getBooleanOr("subscribeToMessages",false )
-                follow.subscribeToWarnings = entity.getBooleanOr("subscribeToWarnings",false )
+                follow.notifyWhenArrive = entity.getBoolean("notifyWhenArrive" )
+                follow.notifyWhenDepart = entity.getBoolean("notifyWhenDepart" )
+                follow.notifyWhenDelayed = entity.getBoolean("notifyWhenDelayed" )
+                follow.subscribeToMessages = entity.getBoolean("subscribeToMessages" )
+                follow.subscribeToWarnings = entity.getBoolean("subscribeToWarnings" )
+                follow.transporterid = entity.getString( "transporterid" )
                 follow.status = entity.getString("status" )
                 follows.add( follow )
             }

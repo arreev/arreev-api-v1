@@ -44,10 +44,15 @@ class AssignmentsServlet : HttpServlet()
             val ownerid = request.getParameter("ownerid" )
             val type = request.getParameter("type" )
             val routeid = request.getParameter("routeid" )
+
+            val filters = StructuredQuery.CompositeFilter.and(
+                    StructuredQuery.PropertyFilter.eq("ownerid",ownerid ),
+                    StructuredQuery.PropertyFilter.eq("type",type ),
+                    StructuredQuery.PropertyFilter.eq("routeid",routeid )
+            )
+
             val query = Query.newEntityQueryBuilder().setNamespace( "com.arreev.api" ).setKind( "assignment" )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("ownerid",ownerid ) )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("type",type ) )
-                    .setFilter( StructuredQuery.PropertyFilter.eq("routeid",routeid ) )
+                    .setFilter( filters )
                     .build()
 
             val entitys = datastore.run( query )
