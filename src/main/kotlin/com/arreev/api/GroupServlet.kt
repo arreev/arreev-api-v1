@@ -5,6 +5,7 @@ import javax.servlet.http.*
 
 import com.google.gson.*
 import com.google.cloud.datastore.*
+import com.google.appengine.api.taskqueue.*
 
 /*
  * https://cloud.google.com/java/getting-started/using-cloud-datastore
@@ -198,6 +199,17 @@ class GroupServlet : HttpServlet()
             r.id = id
 
             transaction.commit()
+
+            /*
+             * cleanup persons that may have been orphaned from deleted group
+             * (all persons must belong to a group)
+             */
+            val queue = QueueFactory.getDefaultQueue()
+            queue.add( TaskOptions.Builder
+                    .withUrl("/purge" )
+                    .param("ownerid",ownerid )
+                    .param("subject","persons" )
+            );
 
             val json = gson.toJson( r,GroupResponse::class.java )
             response.writer.write( json )

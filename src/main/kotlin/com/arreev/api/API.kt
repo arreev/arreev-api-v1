@@ -6,6 +6,7 @@ import javax.servlet.http.*
 
 import com.google.cloud.datastore.*
 import com.google.appengine.api.utils.*
+import javax.xml.crypto.Data
 
 val VERSION = "1.00.1"
 
@@ -85,6 +86,7 @@ fun asFleet( entity: Entity? ) : Fleet? {
     if ( entity != null ) {
         fleet = Fleet()
         fleet.id = "${entity.key.id}"
+        fleet.ownerid = entity.getString("ownerid" )
         fleet.name = entity.getString("name" )
         fleet.description = entity.getString("description" )
         fleet.type = entity.getString("type" )
@@ -148,6 +150,8 @@ fun asTransporter( entity: Entity? ) : Transporter? {
     if ( entity != null ) {
         transporter = Transporter()
         transporter.id = "${entity.key.id}"
+        transporter.ownerid = entity.getString("ownerid" )
+        transporter.fleetid = entity.getString("fleetid" )
         transporter.name = entity.getString("name" )
         transporter.number = entity.getLong("number" );
         transporter.marquee = entity.getString("marquee" )
@@ -233,6 +237,7 @@ fun asPerson( entity: Entity? ) : Person? {
         person = Person()
         person.id = "${entity.key.id}"
         person.name = entity.getString("name" )
+        person.email = getOptionalString( entity,"email" )
         person.type = entity.getString("type" )
         person.category = entity.getString("category" )
         person.description = entity.getString("description" )
@@ -242,4 +247,29 @@ fun asPerson( entity: Entity? ) : Person? {
     }
 
     return person
+}
+
+@Throws( DatastoreException::class )
+fun asInvitation( entity: Entity? ) : Invitation? {
+    var invitation: Invitation? = null
+
+    if ( entity != null ) {
+        invitation = Invitation()
+        invitation.id = "${entity.key.id}"
+        invitation.status = getOptionalString( entity,"status" )
+    }
+
+    return invitation
+}
+
+fun getOptionalString( entity:Entity,name:String  ) : String? {
+    var value: String? = null
+
+    try {
+        value = entity.getString( name )
+    } catch ( x:DatastoreException ) {
+        x.printStackTrace()
+    }
+
+    return value
 }

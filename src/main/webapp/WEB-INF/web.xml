@@ -171,4 +171,31 @@
         <url-pattern>/person</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>invitation</servlet-name>
+        <servlet-class>com.arreev.api.InvitationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>invitation</servlet-name>
+        <url-pattern>/invitation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>cleanup</servlet-name>
+        <servlet-class>com.arreev.api.CleanupServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>cleanup</servlet-name>
+        <url-pattern>/cleanup</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>purge</servlet-name>
+        <servlet-class>com.arreev.api.PurgeWorker</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>purge</servlet-name>
+        <url-pattern>/purge</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -51,10 +51,16 @@ class TransportersServlet : HttpServlet()
             val ownerid = request.getParameter("ownerid" )
             val fleetid = request.getParameter("fleetid" )
 
-            val filters = StructuredQuery.CompositeFilter.and(
-                    StructuredQuery.PropertyFilter.eq("ownerid",ownerid ),
-                    StructuredQuery.PropertyFilter.eq("fleetid",fleetid )
-            )
+            val filters = if ( ownerid != null ) {
+                StructuredQuery.CompositeFilter.and(
+                        StructuredQuery.PropertyFilter.eq("ownerid", ownerid),
+                        StructuredQuery.PropertyFilter.eq("fleetid", fleetid)
+                )
+            } else {
+                StructuredQuery.CompositeFilter.and(
+                        StructuredQuery.PropertyFilter.eq("fleetid", fleetid)
+                )
+            }
 
             val query = Query.newEntityQueryBuilder().setNamespace( "com.arreev.api" ).setKind( "transporter" )
                     .setFilter( filters )
@@ -66,6 +72,8 @@ class TransportersServlet : HttpServlet()
                 if ( entity != null ) {
                     val transporter = Transporter()
                     transporter.id = "${entity.key.id}"
+                    transporter.ownerid = entity.getString("ownerid" )
+                    transporter.fleetid = entity.getString("fleetid" )
                     transporter.name = entity.getString("name" )
                     transporter.number = entity.getLong("number" )
                     transporter.marquee = entity.getString("marquee" )

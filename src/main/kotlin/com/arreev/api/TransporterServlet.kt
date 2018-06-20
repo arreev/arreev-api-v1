@@ -53,6 +53,8 @@ class TransporterServlet : HttpServlet()
             if (entity != null) {
                 val transporter = Transporter()
                 transporter.id = "${entity.key.id}";
+                transporter.ownerid = entity.getString("ownerid" )
+                transporter.fleetid = entity.getString("fleetid" )
                 transporter.name = entity.getString("name")
                 transporter.number = entity.getLong("number")
                 transporter.marquee = entity.getString("marquee")

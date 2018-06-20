@@ -75,6 +75,7 @@ class PersonsServlet : HttpServlet()
                 val person = Person()
                 person.id = "${entity.key.id}"
                 person.name = entity.getString("name" )
+                person.email = getOptionalString( entity,"email" )
                 person.type = entity.getString("type" )
                 person.category = entity.getString("category" )
                 person.description = entity.getString("description" )

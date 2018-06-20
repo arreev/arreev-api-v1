@@ -56,6 +56,7 @@ class FleetServlet : HttpServlet()
             if ( entity != null ) {
                 val fleet = Fleet()
                 fleet.id = "${entity.key.id}";
+                fleet.ownerid = entity.getString("ownerid" )
                 fleet.name = entity.getString("name" )
                 fleet.type = entity.getString("type" )
                 fleet.category = entity.getString("category" )
