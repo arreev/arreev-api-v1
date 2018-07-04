@@ -198,4 +198,13 @@
         <url-pattern>/purge</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>notifications-service</servlet-name>
+        <servlet-class>com.arreev.api.NotificationsServiceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>notifications-service</servlet-name>
+        <url-pattern>/notifications-service</url-pattern>
+    </servlet-mapping>
+
 </web-app>
